@@ -1,36 +1,43 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import tasksRouter from './api/tasks';
-import './db';
-import usersRouter from './api/users';
-// other imports
 import cors from 'cors';
+import tasksRouter from './api/tasks';
+import usersRouter from './api/users';
+import './db'; // Ensure your database connection is established
 
 dotenv.config();
 
 const errHandler = (err, req, res, next) => {
-  /* if the error in development then send stack trace to display whole error,
-  if it's in production then just send error message  */
-  if(process.env.NODE_ENV === 'production') {
-    return res.status(500).send(`Something went wrong!`);
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({
+      error: 'Validation Error',
+      message: err.message,
+      details: err.errors, // Detailed error information from Mongoose
+    });
   }
-  res.status(500).send(`Hey!! You caught the error 👍👍. Here's the details: ${err.stack} `);
+
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(500).send('Something went wrong!');
+  }
+
+  res.status(500).send(`Hey!! You caught the error. Here's the details: ${err.stack}`);
 };
 
 const app = express();
-
 const port = process.env.PORT;
 
-app.use(express.json());
+if (!port) {
+  console.error('PORT is not defined in .env file');
+  process.exit(1);
+}
+
+app.use(cors()); // Enable CORS
+app.use(express.json()); // Middleware to parse JSON
 
 app.use('/api/tasks', tasksRouter);
-
-app.use(errHandler);
-
 app.use('/api/users', usersRouter);
 
-// Enable CORS for all requests
-app.use(cors());
+app.use(errHandler); // Error handler goes after all routes
 
 app.listen(port, () => {
   console.info(`Server running at ${port}`);
