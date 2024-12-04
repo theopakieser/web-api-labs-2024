@@ -1,6 +1,6 @@
 import {
     getUpcomingMovies, getGenres
-  } from '../tmdb-api';
+  } from '../tmdb.js';
 import movieModel from './movieModel';
 import asyncHandler from 'express-async-handler';
 import express from 'express';

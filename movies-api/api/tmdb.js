@@ -16,7 +16,6 @@ export const getUpcomingMovies = async () => {
     }
 };
 
-import fetch from 'node-fetch';
 
 export const getGenres = async () => {
     try {
