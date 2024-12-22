@@ -37,4 +37,3 @@ MovieSchema.statics.findByMovieDBId = function (id) {
 
 export default mongoose.model('Movies', MovieSchema);
 
-
